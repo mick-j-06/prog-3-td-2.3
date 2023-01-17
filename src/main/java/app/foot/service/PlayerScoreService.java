@@ -1,5 +1,6 @@
 package app.foot.service;
 
+import app.foot.exception.BadRequestException;
 import app.foot.model.Match;
 import app.foot.model.PlayerScorer;
 import app.foot.repository.MatchRepository;
@@ -33,7 +34,7 @@ public class PlayerScoreService {
             Thread.sleep(500);
             return matchService.getMatch(matchId);
         } else {
-            throw new RuntimeException("Id match: " + matchId + " does not exist");
+            throw new BadRequestException("Match Id: " + matchId + " does not exist");
         }
     }
 }
