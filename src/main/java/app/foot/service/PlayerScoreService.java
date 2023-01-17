@@ -7,6 +7,7 @@ import app.foot.repository.MatchRepository;
 import app.foot.repository.PlayerScoreRepository;
 import app.foot.repository.entity.MatchEntity;
 import app.foot.repository.mapper.PlayerMapper;
+import app.foot.validator.PlayerScoreValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +20,11 @@ public class PlayerScoreService {
     private PlayerMapper playerMapper;
     private MatchRepository matchRepository;
     private MatchService matchService;
+    private PlayerScoreValidator playerScoreValidator;
 
     public synchronized Match saveAllByMatchId(Integer matchId, List<PlayerScorer> playerScorerList) throws InterruptedException {
         if (matchRepository.existsById(matchId)) {
+            playerScoreValidator.accept(playerScorerList);
             MatchEntity matchEntity = matchRepository.getReferenceById(matchId);
             Thread thread = new Thread(() -> {
                 playerScoreRepository.saveAll(
