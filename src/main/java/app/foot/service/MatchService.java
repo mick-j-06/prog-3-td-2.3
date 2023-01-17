@@ -19,4 +19,10 @@ public class MatchService {
                 .map(mapper::toDomain)
                 .toList();
     }
+
+    public Match getMatch(Integer id) {
+        return mapper.toDomain(
+                repository.getReferenceById(id)
+        );
+    }
 }
