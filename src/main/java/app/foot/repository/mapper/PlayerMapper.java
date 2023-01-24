@@ -21,7 +21,7 @@ public class PlayerMapper {
         .id(entity.getId())
         .name(entity.getName())
         .isGuardian(entity.isGuardian())
-        .teamName(entity.getTeam().getName())
+        .teamName(entity.getTeam() != null ? entity.getTeam().getName() : null)
         .build();
   }
 
