@@ -33,7 +33,6 @@ public class PlayerController {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    //TODO Don't forget to add integration tests for this
     @PutMapping("/players")
     public List<Player> putPlayers(@RequestBody List<UpdatePlayer> toUpdate) {
         List<app.foot.model.UpdatePlayer> domain = toUpdate.stream()
