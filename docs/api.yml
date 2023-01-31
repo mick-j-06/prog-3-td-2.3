@@ -5,6 +5,19 @@ info:
   version: latest
   title: PROG3 - TD2
 paths:
+  /matches/{matchId}:
+    get:
+      tags:
+        - Matches
+      summary: Get match by Id
+      operationId: getMatchById
+      responses:
+        '200':
+          description: Match
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
   /matches:
     get:
       tags:
@@ -47,6 +60,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Match'
+  /players:
+    get:
+      tags:
+        - Players
+      summary: Get all players
+      operationId: getPlayers
+      responses:
+        '200':
+          description: List of Players
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Player'
+    post:
+      tags:
+        - Players
+      summary: Add players
+      description: Be careful! A player must have a team.
+      operationId: addPlayers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PlayerWithoutId'
+      responses:
+        '200':
+          description: The Players created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
+    put:
+      tags:
+        - Players
+      summary: Update players
+      operationId: putPlayers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PlayerWithoutTeam'
+      responses:
+        '200':
+          description: The Players updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Player'
 components:
   schemas:
     Team:
@@ -58,12 +125,26 @@ components:
           type: string
     Player:
       properties:
+        teamName:
+          type: string
+      allOf:
+        - $ref: "#/components/schemas/PlayerWithoutTeam"
+    PlayerWithoutTeam:
+      properties:
         id:
           type: integer
         name:
           type: string
         isGuardian:
           type: boolean
+    PlayerWithoutId:
+      properties:
+        name:
+          type: string
+        isGuardian:
+          type: boolean
+        teamName:
+          type: string
     Match:
       type: object
       properties:
@@ -95,7 +176,7 @@ components:
       type: object
       properties:
         player:
-          $ref: '#/components/schemas/Player'
+          $ref: '#/components/schemas/PlayerWithoutTeam'
         isOG:
           type: boolean
         scoreTime:
