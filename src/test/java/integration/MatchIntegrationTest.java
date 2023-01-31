@@ -58,6 +58,29 @@ class MatchIntegrationTest {
     }
 
     @Test
+    void create_goals_ok() throws Exception {
+        int MATCH_ID = 3;
+        PlayerScorer toCreate = PlayerScorer.builder()
+                .player(player1())
+                .scoreTime(5)
+                .isOG(false)
+                .build();
+        MockHttpServletResponse response = mockMvc
+                .perform(post("/matches/" + MATCH_ID + "/goals")
+                        .content(objectMapper.writeValueAsString(List.of(toCreate)))
+                        .contentType("application/json")
+                        .accept("application/json"))
+                .andReturn()
+                .getResponse();
+        Match actual = objectMapper.readValue(
+                response.getContentAsString(), Match.class);
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(1, actual.getTeamA().getScorers().size());
+        assertEquals(1, actual.getTeamA().getScore());
+    }
+
+    @Test
     void create_goals_ko() {
         int MATCH_ID = 3;
         PlayerScorer toCreate = PlayerScorer.builder()
