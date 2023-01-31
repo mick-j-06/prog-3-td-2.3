@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static utils.TestUtils.*;
@@ -99,5 +100,23 @@ public class PlayerMapperTest {
                 .ownGoal(false)
                 .match(matchEntity1)
                 .build(), actual);
+    }
+
+    @Test
+    void player_to_entity_ok() {
+        when(teamRepositoryMock.findByName(eq("Barea"))).thenReturn(teamBarea());
+        PlayerEntity actual = subject.toEntity(
+                Player.builder()
+                        .id(1)
+                        .name("Rakoto")
+                        .isGuardian(false)
+                        .teamName("Barea")
+                        .build()
+        );
+
+        assertEquals(
+                playerEntityRakoto(teamBarea()),
+                actual
+        );
     }
 }
