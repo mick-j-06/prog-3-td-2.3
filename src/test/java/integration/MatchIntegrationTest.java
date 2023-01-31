@@ -2,6 +2,7 @@ package integration;
 
 import app.foot.FootApi;
 import app.foot.controller.rest.*;
+import app.foot.exception.BadRequestException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -17,9 +18,9 @@ import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = FootApi.class)
@@ -54,6 +55,30 @@ class MatchIntegrationTest {
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertEquals(matchList.size(), 3);
         assertTrue(matchList.contains(expectedMatch2()));
+    }
+
+    @Test
+    void create_goals_ko() {
+        int MATCH_ID = 3;
+        PlayerScorer toCreate = PlayerScorer.builder()
+                .player(player1())
+                .scoreTime(100)
+                .isOG(false)
+                .build();
+        Exception exception = assertThrows(Exception.class, () -> {
+            MockHttpServletResponse responses = mockMvc
+                    .perform(post("/matches/" + MATCH_ID + "/goals")
+                            .content(objectMapper.writeValueAsString(List.of(toCreate)))
+                            .contentType("application/json")
+                            .accept("application/json"))
+                    .andReturn()
+                    .getResponse();
+        });
+        assertEquals(BadRequestException.class, exception.getCause().getClass());
+        assertEquals(
+                "400 BAD_REQUEST : Player#J1 cannot score before after minute 90.",
+                exception.getCause().getMessage()
+        );
     }
 
     private List<Match> convertFromHttpResponse(MockHttpServletResponse response)
@@ -97,6 +122,15 @@ class MatchIntegrationTest {
                                 .scoreTime(80)
                                 .isOG(true)
                                 .build()))
+                .build();
+    }
+
+    private static Player player1() {
+        return Player.builder()
+                .id(1)
+                .name("J1")
+                .teamName("E1")
+                .isGuardian(false)
                 .build();
     }
 
