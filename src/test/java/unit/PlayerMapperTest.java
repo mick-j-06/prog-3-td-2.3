@@ -1,5 +1,6 @@
 package unit;
 
+import app.foot.exception.BadRequestException;
 import app.foot.model.Player;
 import app.foot.model.PlayerScorer;
 import app.foot.repository.MatchRepository;
@@ -18,8 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static utils.TestUtils.*;
 
 public class PlayerMapperTest {
@@ -123,13 +123,15 @@ public class PlayerMapperTest {
 
     @Test
     void player_to_entity_ko() {
-        when(teamRepositoryMock.findByName(eq("Barea"))).thenReturn(teamBarea());
-        assertThrows(NullPointerException.class, () -> subject.toEntity(
+        when(teamRepositoryMock.findByName(anyString())).thenReturn(null);
+        Exception exception = assertThrows(BadRequestException.class, () -> subject.toEntity(
                 Player.builder()
                         .id(1)
                         .name("Rakoto")
-                        .teamName("Barea")
+                        .teamName("team")
+                        .isGuardian(false)
                         .build()
         ));
+        assertEquals("400 BAD_REQUEST : Team with name:team not found", exception.getMessage());
     }
 }

@@ -1,5 +1,6 @@
 package app.foot.repository.mapper;
 
+import app.foot.exception.BadRequestException;
 import app.foot.model.Player;
 import app.foot.model.PlayerScorer;
 import app.foot.model.UpdatePlayer;
@@ -8,6 +9,7 @@ import app.foot.repository.PlayerRepository;
 import app.foot.repository.TeamRepository;
 import app.foot.repository.entity.PlayerEntity;
 import app.foot.repository.entity.PlayerScoreEntity;
+import app.foot.repository.entity.TeamEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -45,10 +47,14 @@ public class PlayerMapper {
     }
 
     public PlayerEntity toEntity(Player domain) {
+        TeamEntity teamEntity = teamRepository.findByName(domain.getTeamName());
+        if (teamEntity == null) {
+            throw new BadRequestException("Team with name:" + domain.getTeamName() + " not found");
+        }
         return PlayerEntity.builder()
                 .id(domain.getId())
                 .name(domain.getName())
-                .team(teamRepository.findByName(domain.getTeamName()))
+                .team(teamEntity)
                 .guardian(domain.getIsGuardian())
                 .build();
     }
