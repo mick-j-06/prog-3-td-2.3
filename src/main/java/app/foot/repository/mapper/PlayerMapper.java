@@ -2,6 +2,7 @@ package app.foot.repository.mapper;
 
 import app.foot.model.Player;
 import app.foot.model.PlayerScorer;
+import app.foot.model.UpdatePlayer;
 import app.foot.repository.MatchRepository;
 import app.foot.repository.PlayerRepository;
 import app.foot.repository.TeamRepository;
@@ -50,5 +51,14 @@ public class PlayerMapper {
                 .team(teamRepository.findByName(domain.getTeamName()))
                 .guardian(domain.getIsGuardian())
                 .build();
+    }
+
+    public PlayerEntity toEntity(UpdatePlayer domain) {
+        PlayerEntity entity = playerRepository.getReferenceById(domain.getId());
+        if (domain.getName() != null)
+            entity.setName(domain.getName());
+        if (domain.getIsGuardian() != null)
+            entity.setGuardian(domain.getIsGuardian());
+        return entity;
     }
 }
